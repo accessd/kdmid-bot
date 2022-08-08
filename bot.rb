@@ -9,7 +9,7 @@ class Bot
   attr_reader :link, :browser, :client, :current_time
 
   def initialize
-    @link = "http://istanbul.kdmid.ru/queue/OrderInfo.aspx?id=#{ENV.fetch('ORDER_ID')}&cd=#{ENV.fetch('CODE')}"
+    @link = "http://#{ENV.fetch('KDMID_SUBDOMAIN')}.kdmid.ru/queue/OrderInfo.aspx?id=#{ENV.fetch('ORDER_ID')}&cd=#{ENV.fetch('CODE')}"
     @client = TwoCaptcha.new(ENV.fetch('TWO_CAPTCHA_KEY'))
     @current_time = Time.now.utc.to_s
     @browser = Watir::Browser.new ENV.fetch('BROWSER').to_sym, options: { profile: 'default-release' }
