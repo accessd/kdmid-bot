@@ -57,6 +57,7 @@ PLATFORMS
 
 DEPENDENCIES
   pry
+  selenium-webdriver (= 4.3.0)
   telegram-bot-ruby
   two_captcha
   watir

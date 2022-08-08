@@ -12,12 +12,17 @@ class Bot
     @link = "http://#{ENV.fetch('KDMID_SUBDOMAIN')}.kdmid.ru/queue/OrderInfo.aspx?id=#{ENV.fetch('ORDER_ID')}&cd=#{ENV.fetch('CODE')}"
     @client = TwoCaptcha.new(ENV.fetch('TWO_CAPTCHA_KEY'))
     @current_time = Time.now.utc.to_s
-    @browser = Watir::Browser.new ENV.fetch('BROWSER').to_sym, options: { profile: 'default-release' }
+    puts 'Init...'
+    @browser = Watir::Browser.new(
+      ENV.fetch('BROWSER').to_sym,
+      url: "http://#{ENV.fetch('HUB_HOST')}/wd/hub",
+      options: {}
+    )
   end
 
   def notify_user(message)
     puts message
-    `say "#{message}"`
+    # `say "#{message}"`
     return unless ENV['TELEGRAM_TOKEN']
 
     Telegram::Bot::Client.run(ENV['TELEGRAM_TOKEN']) do |bot|
@@ -61,6 +66,11 @@ class Bot
   def pass_captcha_on_form
     sleep 3
 
+    if browser.alert.exists?
+      browser.alert.ok
+      puts 'alert found'
+    end
+
     puts "let's find the captcha image..."
     captcha_image = browser.images(id: 'ctl00_MainContent_imgSecNum').first
     captcha_image.wait_until(timeout: 5, &:exists?)
@@ -84,7 +94,7 @@ class Bot
 
   def click_make_appointment_button
     make_appointment_btn = browser.button(id: 'ctl00_MainContent_ButtonB')
-    make_appointment_btn.wait_until(timeout: 5, &:exists?)
+    make_appointment_btn.wait_until(timeout: 60, &:exists?)
     make_appointment_btn.click
   end
 
@@ -106,7 +116,11 @@ class Bot
     browser.button(id: 'ctl00_MainContent_ButtonA').click
 
     sleep 3
-    browser.alert.ok
+
+    if browser.alert.exists?
+      browser.alert.ok
+    end
+
     sleep 1
 
     pass_hcaptcha
@@ -121,10 +135,8 @@ class Bot
 
     browser.close
     puts '=' * 50
-  rescue Selenium::WebDriver::Error => e
-    notify_user('selenium failed')
-    raise e
   rescue Exception => e
+    browser.close
     notify_user('exception!')
     raise e
   end

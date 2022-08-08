@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+# Builds the bot docker image for watir
+
+set -e
+
+docker-compose build --pull bot

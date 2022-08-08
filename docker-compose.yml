@@ -1,0 +1,46 @@
+---
+version: "3.7"
+
+services:
+  hub:
+    image: selenium/hub:4.3.0
+    environment:
+      GRID_BROWSER_TIMEOUT: 10000 # 10 seconds
+      GRID_NEW_SESSION_WAIT_TIMEOUT: 20000
+      GRID_NODE_POLLING: 300
+      GRID_TIMEOUT: 10000
+    ports:
+      - "4444:4444"
+    networks:
+      - watir-docker-grid-network
+
+  node-firefox:
+    image: selenium/node-firefox:103.0
+    environment: &SELENIUM_NODE_ENV
+      SE_EVENT_BUS_HOST: hub
+      SE_EVENT_BUS_PUBLISH_PORT: 4442
+      SE_EVENT_BUS_SUBSCRIBE_PORT: 4443
+      HUB_HOST: hub
+      HUB_PORT: 4444
+    ports:
+      - "5900:5900"
+    volumes:
+      - /dev/shm:/dev/shm
+    networks:
+      - watir-docker-grid-network
+
+  bot:
+    build:
+      context: .
+    env_file:
+      - ./.env
+    volumes:
+      - .:/app
+    command: ruby bot.rb
+    networks:
+      - watir-docker-grid-network
+
+networks:
+  watir-docker-grid-network:
+    driver: bridge
+    name: watir-docker-grid-network

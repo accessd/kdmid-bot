@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+# Starts the Selenium hub and the Selenium browser node
+
+set -e
+
+./bin/stop
+
+docker-compose up -d hub node-firefox
