@@ -18,11 +18,11 @@ Run bot with:
 
     $ bin/bot
 
-### How to see browser?
+### How to see the browser?
 
-Browser starts with Selenium node. So, after having started the Selenium hub and nodes (bin/start),
-open a browser and go to http://localhost:4444/ui#/sessions,
-then click the 'play' button to connect with VNC (password: secret).
+View the firefox node via VNC (password: secret):
+
+    $ open vnc://localhost:5900
 
 ### Locally
 
