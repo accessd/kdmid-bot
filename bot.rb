@@ -13,10 +13,15 @@ class Bot
     @client = TwoCaptcha.new(ENV.fetch('TWO_CAPTCHA_KEY'))
     @current_time = Time.now.utc.to_s
     puts 'Init...'
+
+    options = {}
+    if ENV['BROWSER_PROFILE']
+      options.merge!(profile: ENV['BROWSER_PROFILE'])
+    end
     @browser = Watir::Browser.new(
       ENV.fetch('BROWSER').to_sym,
       url: "http://#{ENV.fetch('HUB_HOST')}/wd/hub",
-      options: {}
+      options: options
     )
   end
 

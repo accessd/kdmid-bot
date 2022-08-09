@@ -18,7 +18,7 @@ Run bot with:
 
     $ bin/bot
 
-### How to see the browser?
+**How to see the browser?**
 
 View the firefox node via VNC (password: secret):
 
