@@ -165,7 +165,7 @@ class Bot
     pass_hcaptcha
     pass_ddgcaptcha
 
-    browser.wait_until(timeout: 30) { |b| b.title == 'Очередь в Стамбуле' }
+    browser.button(id: 'ctl00_MainContent_ButtonA').wait_until(timeout: 30, &:exists?)
 
     pass_captcha_on_form
 
