@@ -7,6 +7,7 @@ Watir.default_timeout = 60
 
 class Bot
   attr_reader :link, :browser, :client, :current_time
+  PASS_CAPTCHA_ATTEMPTS_LIMIT = 5
 
   def initialize
     @link = "http://#{ENV.fetch('KDMID_SUBDOMAIN')}.kdmid.ru/queue/OrderInfo.aspx?id=#{ENV.fetch('ORDER_ID')}&cd=#{ENV.fetch('CODE')}"
@@ -68,6 +69,55 @@ class Bot
     end
   end
 
+  def pass_ddgcaptcha
+    attempt = 1
+    sleep 5
+
+    while browser.div(id: 'ddg-captcha').exists? && attempt <= PASS_CAPTCHA_ATTEMPTS_LIMIT
+      puts "attempt: [#{attempt}] let's find the ddg captcha image..."
+
+      checkbox = browser.div(id: 'ddg-captcha')
+      checkbox.wait_until(timeout: 60, &:exists?)
+      checkbox.click
+
+      captcha_image = browser.iframe(id: 'ddg-iframe').images(class: 'ddg-modal__captcha-image').first
+      captcha_image.wait_until(timeout: 5, &:exists?)
+
+      puts 'save captcha image to file...'
+      sleep 3
+      image_filepath = "./captches/#{current_time}.png"
+      base64_to_file(captcha_image.src, image_filepath)
+
+      puts 'decode captcha...'
+      captcha = client.decode!(path: image_filepath)
+      captcha_code = captcha.text
+      puts "captcha_code: #{captcha_code}"
+
+      # puts 'Enter code:'
+      # code = gets
+      # puts code
+
+      text_field = browser.iframe(id: 'ddg-iframe').text_field(class: 'ddg-modal__input')
+      text_field.set captcha_code
+      browser.iframe(id: 'ddg-iframe').button(class: 'ddg-modal__submit').click
+
+      attempt += 1
+      sleep 15
+    end
+  end
+
+  def base64_to_file(base64_data, filename=nil)
+    start_regex = /data:image\/[a-z]{3,4};base64,/
+    filename ||= SecureRandom.hex
+
+    regex_result = start_regex.match(base64_data)
+    start = regex_result.to_s
+
+    File.open(filename, 'wb') do |file|
+      file.write(Base64.decode64(base64_data[start.length..-1]))
+    end
+  end
+
   def pass_captcha_on_form
     sleep 3
 
@@ -113,6 +163,7 @@ class Bot
     browser.goto link
 
     pass_hcaptcha
+    pass_ddgcaptcha
 
     browser.wait_until(timeout: 30) { |b| b.title == 'Очередь в Стамбуле' }
 
@@ -129,6 +180,7 @@ class Bot
     sleep 1
 
     pass_hcaptcha
+    pass_ddgcaptcha
 
     click_make_appointment_button
 
@@ -141,8 +193,9 @@ class Bot
     browser.close
     puts '=' * 50
   rescue Exception => e
-    browser.close
     notify_user('exception!')
+    sleep 3
+    browser.close
     raise e
   end
 end
