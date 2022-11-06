@@ -6,7 +6,9 @@ Checks ability to make an appointment to consul
 
 Register on https://2captcha.com/ and get API key.
 
-Create .env file and fill variables:
+Get order id and code from the link http://istanbul.kdmid.ru/queue/OrderInfo.aspx?id=ORDER_ID&cd=CODE
+
+Create .env file and replace variables with your values:
 
     $ cp .env.example .env
 
@@ -23,6 +25,14 @@ Run bot with:
 View the firefox node via VNC (password: secret):
 
     $ open vnc://localhost:5900
+
+After testing that bot works properly put command to run bot in crontab, like:
+
+    */5 * * * * cd /path/to/the/bot; bin/bot >> kdmid-bot.log 2>&1
+
+Than you can look at the log file by:
+
+    tail -f kdmid-bot.log
 
 ### Locally
 
