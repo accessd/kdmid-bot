@@ -186,7 +186,7 @@ class Bot
 
     save_page
 
-    unless browser.p(text: /Извините, но в настоящий момент/).exists?
+    unless browser.p(text: /Извините, но в настоящий момент/).exists? || browser.p(text: /Bad Gateway/).exists?
       notify_user('New time for an appointment found!')
     end
 
