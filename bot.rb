@@ -132,10 +132,17 @@ class Bot
 
     puts 'save captcha image to file...'
     image_filepath = "./captches/#{current_time}.png"
+    cropped_image_filepath = "./captches/#{current_time}.crop.png"
     File.write(image_filepath, captcha_image.to_png)
 
+    puts 'crop image'
+    ffmpeg_result = system 'ffmpeg', '-i', image_filepath, '-vf', "crop=in_w/3:in_h:in_w/3:0", cropped_image_filepath
+    if !ffmpeg_result
+       raise "FFMpeg crop failed"
+    end
+
     puts 'decode captcha...'
-    captcha = client.decode!(path: image_filepath)
+    captcha = client.decode!(path: cropped_image_filepath)
     captcha_code = captcha.text
     puts "captcha_code: #{captcha_code}"
 
