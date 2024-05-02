@@ -26,6 +26,8 @@ View the firefox node via VNC (password: secret):
 
     $ open vnc://localhost:5900
 
+> **_NOTE:_**  If you want to access VNC via any public network interface you will need to update listening address in `docker-compose.yml` for `node-firefox` service
+
 After testing that bot works properly put command to run bot in crontab, like:
 
     */5 * * * * cd /path/to/the/bot; bin/bot >> kdmid-bot.log 2>&1
