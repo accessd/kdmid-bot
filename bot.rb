@@ -132,10 +132,23 @@ class Bot
 
     puts 'save captcha image to file...'
     image_filepath = "./captches/#{current_time}.png"
+    target_image_path = image_filepath
+    
     File.write(image_filepath, captcha_image.to_png)
 
+    img = MiniMagick::Image.open(image_filepath)
+    if img.width == 600 && img.height == 200
+      puts 'crop image'
+
+      cropped_image_filepath = "./captches/#{current_time}.crop.png"
+      processed = ImageProcessing::MiniMagick.source(image_filepath).crop(200, 0, 200, 200).call
+
+      FileUtils.cp(processed.path, cropped_image_filepath)
+      target_image_path = cropped_image_filepath
+    end
+
     puts 'decode captcha...'
-    captcha = client.decode!(path: image_filepath)
+    captcha = client.decode!(path: target_image_path)
     captcha_code = captcha.text
     puts "captcha_code: #{captcha_code}"
 
