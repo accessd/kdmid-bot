@@ -4,7 +4,7 @@ FROM bitnami/ruby:3.1.2
 # Set LOCALE to UTF8
 RUN mkdir /gems \
     && apt update -qq \
-    && apt install -y locales build-essential sudo vim iputils-ping tzdata ffmpeg\
+    && apt install -y locales build-essential sudo vim iputils-ping tzdata imagemagick libmagickwand-dev libmagickcore-dev \
     && rm -rf /var/lib/apt/lists/* \
     && gem install bundler:2.2.33 --no-document \
     && echo "en_US.UTF-8 UTF-8" > /etc/locale.gen \
