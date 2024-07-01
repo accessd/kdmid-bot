@@ -15,7 +15,9 @@ class Bot
     @current_time = Time.now.utc.to_s
     puts 'Init...'
 
-    options = {}
+    options = {
+      accept_insecure_certs: true,
+    }
     if ENV['BROWSER_PROFILE']
       options.merge!(profile: ENV['BROWSER_PROFILE'])
     end
