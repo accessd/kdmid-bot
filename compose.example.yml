@@ -3,3 +3,10 @@ services:
   bot-example:
     env_file:
       - ./.env.example
+    build:
+      context: .
+    volumes:
+      - .:/app
+    command: ruby bot.rb
+    networks:
+      - watir-docker-grid-network
