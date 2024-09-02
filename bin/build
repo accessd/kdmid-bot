@@ -4,4 +4,4 @@
 
 set -e
 
-docker-compose build --pull bot
+docker compose build --pull bot
