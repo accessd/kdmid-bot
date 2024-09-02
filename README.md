@@ -34,6 +34,8 @@ bin/bot
 docker compose -f docker-compose.yml -f compose.<var>.yml up bot
 ```
 
+Либо добавить отдельные сервисы в основной файл.
+
 **How to see the browser?**
 
 View the firefox node via VNC (password: secret):
