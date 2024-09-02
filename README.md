@@ -51,7 +51,7 @@ After testing that bot works properly put command to run bot in crontab, like:
 > **WARNING:** Внимание! При повторяющихся запросах к системе в течение дня более 24 раз Ваша заявка будет заблокирована.
 
 ```sh
-0 12 * * * cd /path/to/the/bot; bin/bot >> kdmid-bot.log 2>&1
+0 12 * * * root cd /path/to/the/bot; bin/bot >> kdmid-bot.log 2>&1
 ```
 
 Than you can look at the log file by:
