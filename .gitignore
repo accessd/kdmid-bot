@@ -26,3 +26,7 @@ screenshots/*.png
 
 # Ignore temporary files
 kdmid-bot.log
+
+# Ignore compose owerwrite
+/compose.*
+!.compose.example.yml
