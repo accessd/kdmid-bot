@@ -29,4 +29,4 @@ kdmid-bot.log
 
 # Ignore compose owerwrite
 /compose.*
-!.compose.example.yml
+!compose.example.yml

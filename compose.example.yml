@@ -1,0 +1,5 @@
+---
+services:
+  bot-example:
+    env_file:
+      - ./.env.example
