@@ -15,7 +15,9 @@ class Bot
     @current_time = Time.now.utc.to_s
     puts 'Init...'
 
-    options = {}
+    options = {
+      accept_insecure_certs: true,
+    }
     if ENV['BROWSER_PROFILE']
       options.merge!(profile: ENV['BROWSER_PROFILE'])
     end
@@ -161,6 +163,7 @@ class Bot
   end
 
   def click_make_appointment_button
+    
     make_appointment_btn = browser.button(id: 'ctl00_MainContent_ButtonB')
     make_appointment_btn.wait_until(timeout: 60, &:exists?)
     make_appointment_btn.click
