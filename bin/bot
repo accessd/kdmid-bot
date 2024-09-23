@@ -4,4 +4,4 @@
 
 set -e
 
-docker-compose up bot
+docker compose up bot

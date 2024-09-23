@@ -15,7 +15,9 @@ class Bot
     @current_time = Time.now.utc.to_s
     puts 'Init...'
 
-    options = {}
+    options = {
+      accept_insecure_certs: true,
+    }
     if ENV['BROWSER_PROFILE']
       options.merge!(profile: ENV['BROWSER_PROFILE'])
     end
@@ -32,9 +34,18 @@ class Bot
     return unless ENV['TELEGRAM_TOKEN']
 
     Telegram::Bot::Client.run(ENV['TELEGRAM_TOKEN']) do |bot|
-      bot.api.send_message(chat_id: ENV['TELEGRAM_CHAT_ID'], text: message)
+      bot.api.send_message(chat_id: ENV['TELEGRAM_CHAT_ID'], text: message, parse_mode: 'Markdown')
     end
   end
+
+  def send_scr(photo_path)
+    return unless ENV['TELEGRAM_TOKEN']
+  
+    Telegram::Bot::Client.run(ENV['TELEGRAM_TOKEN']) do |bot|
+      bot.api.send_photo(chat_id: ENV['TELEGRAM_CHAT_ID'], photo: Faraday::UploadIO.new(photo_path, 'image/png'))
+    end
+  end
+  
 
   def pass_hcaptcha
     sleep 5
@@ -161,6 +172,13 @@ class Bot
   end
 
   def click_make_appointment_button
+
+    # Найти элемент по ID ctl00_MainContent_Content и получить его текст
+    content_element = browser.span(id: 'ctl00_MainContent_Content')
+    content_text = content_element.text
+    # Отправить текст в Telegram
+    notify_user("*Проверка:*\n\n#{content_text}")
+
     make_appointment_btn = browser.button(id: 'ctl00_MainContent_ButtonB')
     make_appointment_btn.wait_until(timeout: 60, &:exists?)
     make_appointment_btn.click
@@ -169,6 +187,27 @@ class Bot
   def save_page
     browser.screenshot.save "./screenshots/#{current_time}.png"
     File.open("./pages/#{current_time}.html", 'w') { |f| f.write browser.html }
+    send_scr("./screenshots/#{current_time}.png")
+  end
+
+  def stop_text_found?
+    failure_texts = [
+      'Извините, но в настоящий момент',
+      'Свободное время в системе записи отсутствует',
+      'Для проверки наличия свободного времени',
+      'нет свободного времени',
+      'Bad Gateway'
+    ]
+    if failure_texts.any? { |text| browser.text.include?(text) }
+      raise "Failure text found in the page."
+    end
+    true
+  end
+
+  def get_center_panel_text
+    center_panel = browser.td(id: 'center-panel')
+    center_panel_text = center_panel.text
+    center_panel_text
   end
 
   def check_queue
@@ -198,15 +237,17 @@ class Bot
     click_make_appointment_button
 
     save_page
+    
+    panel_text = get_center_panel_text
 
-    unless browser.p(text: /Извините, но в настоящий момент/).exists? || browser.p(text: /Bad Gateway/).exists?
-      notify_user('New time for an appointment found!')
+    unless stop_text_found?
+      notify_user("*Появилось место для записи!*\n\n#{panel_text}")
     end
 
     browser.close
     puts '=' * 50
   rescue Exception => e
-    notify_user('exception!')
+    notify_user("*Мест нет!*\n\n#{panel_text}")
     sleep 3
     browser.close
     raise e

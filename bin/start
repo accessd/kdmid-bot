@@ -6,4 +6,4 @@ set -e
 
 ./bin/stop
 
-docker-compose up -d hub node-firefox
+docker compose up -d hub node-firefox
